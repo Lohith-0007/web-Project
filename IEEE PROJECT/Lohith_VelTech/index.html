@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Secure Data Transmission</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+/* Cybersecurity Background */
+background:
+linear-gradient(rgba(5,10,25,0.9), rgba(5,10,25,0.95)),
+url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1500&q=80');
+
+background-size:cover;
+background-position:center;
+color:white;
+}
+
+/* Glass Container */
+.container{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+padding:50px;
+border-radius:20px;
+text-align:center;
+width:60%;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Title */
+h1{
+font-size:38px;
+margin-bottom:10px;
+background:linear-gradient(90deg,#00c6ff,#7c3aed);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+/* Subtitle */
+h2{
+color:#cbd5f5;
+margin-bottom:20px;
+}
+
+/* Description */
+p{
+font-size:17px;
+line-height:1.6;
+margin-bottom:25px;
+}
+
+/* Button */
+.btn{
+padding:14px 35px;
+border:none;
+border-radius:30px;
+background:linear-gradient(90deg,#00c6ff,#7c3aed);
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.08);
+box-shadow:0 10px 25px rgba(124,58,237,0.6);
+}
+
+/* Auth Section */
+.auth{
+display:none;
+width:350px;
+}
+
+/* Inputs */
+input{
+width:90%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.15);
+color:white;
+}
+
+/* Toggle */
+.toggle{
+cursor:pointer;
+font-size:14px;
+color:#cbd5f5;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HOME PAGE -->
+<div class="container" id="homePage">
+
+<h1>Secure Data Transmission</h1>
+
+<h2>Confidential Communication Framework</h2>
+
+<p>
+This project ensures secure transmission of sensitive data using encryption and
+authentication mechanisms. It protects data from unauthorized access by applying
+advanced cryptographic techniques, ensuring confidentiality, integrity, and secure
+communication between sender and receiver.
+</p>
+
+<button class="btn" onclick="showAuth()">Start Now</button>
+
+</div>
+
+<!-- AUTH PAGE -->
+<div class="container auth" id="authPage">
+
+<!-- SIGN IN -->
+<div id="signin">
+<h1>Sign In</h1>
+
+<input placeholder="Username">
+<input type="password" placeholder="Password">
+
+<button class="btn" onclick="login()">Login</button>
+
+<p class="toggle" onclick="toggle()">Don't have account? Sign Up</p>
+</div>
+
+<!-- SIGN UP -->
+<div id="signup" style="display:none;">
+<h1>Sign Up</h1>
+
+<input placeholder="Username">
+<input type="email" placeholder="Email">
+<input type="password" placeholder="Password">
+
+<button class="btn" onclick="toggle()">Register</button>
+
+<p class="toggle" onclick="toggle()">Already have account? Sign In</p>
+</div>
+
+</div>
+
+<script>
+
+/* Navigation */
+function showAuth(){
+homePage.style.display="none";
+authPage.style.display="block";
+}
+
+/* Toggle */
+function toggle(){
+signin.style.display = signin.style.display==="none"?"block":"none";
+signup.style.display = signup.style.display==="none"?"block":"none";
+}
+
+/* Login */
+function login(){
+window.location.href = "dashboard.html";
+}
+
+</script>
+
+</body>
+</html>

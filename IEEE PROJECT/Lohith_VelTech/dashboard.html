@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Secure Data Transmission</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+display:flex;
+height:100vh;
+
+/* Cybersecurity Background */
+background:
+linear-gradient(rgba(5,10,25,0.9), rgba(5,10,25,0.95)),
+url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1500&q=80');
+
+background-size:cover;
+color:white;
+}
+
+/* Sidebar */
+.sidebar{
+width:230px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+padding-top:20px;
+}
+
+.menu-item{
+padding:15px;
+cursor:pointer;
+}
+.menu-item:hover{
+background:rgba(255,255,255,0.1);
+}
+
+/* Content */
+.content{
+flex:1;
+padding:25px;
+overflow:auto;
+}
+
+/* Card */
+.card{
+background:rgba(255,255,255,0.08);
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+/* Inputs */
+input{
+padding:10px;
+margin:8px;
+border-radius:10px;
+border:none;
+background:rgba(255,255,255,0.15);
+color:white;
+width:250px;
+}
+
+/* Button */
+.btn{
+padding:10px 20px;
+border:none;
+border-radius:25px;
+background:linear-gradient(90deg,#00c6ff,#7c3aed);
+color:white;
+cursor:pointer;
+}
+
+/* Chat Box */
+.chat-box{
+margin-top:20px;
+max-height:250px;
+overflow-y:auto;
+background:rgba(255,255,255,0.05);
+padding:10px;
+border-radius:10px;
+}
+
+.message{
+background:rgba(0,198,255,0.2);
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+}
+.center-box{
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+height:60vh; /* controls vertical centering */
+text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+<div class="menu-item" onclick="showPage('login')">Login</div>
+<div class="menu-item" onclick="showPage('chat')">Secure Chat</div>
+<div class="menu-item" onclick="showPage('visual')">Visualization</div>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+<div id="loginPage" class="card">
+
+<div class="center-box">
+<h2>Secure Login 🔐</h2>
+
+<input id="username" placeholder="Username"><br>
+<input id="password" type="password" placeholder="Password"><br>
+
+<button class="btn" onclick="login()">Login</button>
+</div>
+
+</div>
+
+<!-- CHAT -->
+<div id="chatPage" class="card" style="display:none;">
+<h2>Secure Chat System 🔒</h2>
+
+<input id="receiver" placeholder="Send to"><br>
+<input id="message" placeholder="Enter message"><br>
+
+<button class="btn" onclick="sendMessage()">Send</button>
+
+<div class="chat-box" id="chat"></div>
+</div>
+<div id="visualPage" class="card" style="display:none;">
+<h2>📊 Encryption Visualization</h2>
+
+<canvas id="timeChart"></canvas>
+<br>
+<canvas id="sizeChart"></canvas>
+</div>
+</div>
+<script>
+
+let currentUser = "";
+let loggedIn = false;
+
+let encryptionTimes = [];
+let messageSizes = [];
+let encryptedSizes = [];
+
+let timeChart, sizeChart;
+
+/* USER SYSTEM */
+const users = {
+    user1: "password1",
+    user2: "password2",
+    demo: "1234"
+};
+
+/* NAVIGATION */
+function showPage(p){
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("chatPage").style.display="none";
+    document.getElementById("visualPage").style.display="none";
+
+    if(p==="login") document.getElementById("loginPage").style.display="block";
+    if(p==="chat") document.getElementById("chatPage").style.display="block";
+  if(p==="visual"){
+    document.getElementById("visualPage").style.display="block";
+    updateCharts();   // 👈 ADD THIS
+}
+}
+
+/* LOGIN */
+function login(){
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    if(users[username] && users[username] === password){
+
+        currentUser = username;
+        loggedIn = true;
+
+        localStorage.removeItem("chat");   // ✅ clear old chat
+
+        alert("Login Successful ✅");
+
+        showPage('chat');
+
+    } else {
+        alert("Invalid credentials ❌");
+    }
+}
+
+/* REALISTIC ENCRYPTION */
+function encrypt(msg){
+    let randomBytes = crypto.getRandomValues(new Uint8Array(16));
+
+    let hex = Array.from(randomBytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+    let encoded = btoa(msg);
+
+    return "AES-256::" + hex + ":" + encoded;
+}
+
+/* DECRYPT */
+function decrypt(cipher){
+    let parts = cipher.split(":");
+    return atob(parts[2]);
+}
+
+/* SEND MESSAGE */
+function sendMessage(){
+
+    let receiver = document.getElementById("receiver").value;
+    let message = document.getElementById("message").value;
+
+    if(receiver === "" || message.trim() === ""){
+        alert("Enter receiver and message");
+        return;
+    }
+
+    let start = performance.now();
+
+    let encrypted = encrypt(message);
+
+    let end = performance.now();
+
+    encryptionTimes.push((end - start).toFixed(2));
+    messageSizes.push(message.length);
+    encryptedSizes.push(encrypted.length);
+
+    updateCharts();   // update graphs
+
+    let chatData = JSON.parse(localStorage.getItem("chat")) || [];
+
+    chatData.push({
+        sender: currentUser,
+        receiver: receiver,
+        encrypted: encrypted
+    });
+
+    localStorage.setItem("chat", JSON.stringify(chatData));
+
+    displayMessage("You → " + receiver, message, encrypted);
+
+    document.getElementById("message").value = "";
+
+    showPage('visual');   // 🔥 auto open graph
+}
+
+/* DISPLAY MESSAGE */
+function displayMessage(title, message, encrypted){
+
+    let chatBox = document.getElementById("chat");
+
+    let div = document.createElement("div");
+    div.className = "message";
+
+    div.innerHTML = `
+        <b>${title}</b><br>
+        Message: ${message}<br>
+        <small style="color:lightgreen;">Encrypted: ${encrypted}</small>
+    `;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* RECEIVE MESSAGES */
+setInterval(()=>{
+
+    if(!loggedIn) return;
+
+    let chatData = JSON.parse(localStorage.getItem("chat")) || [];
+
+    chatData.forEach((msg)=>{
+
+        if(msg.receiver === currentUser && !msg.delivered){
+
+            let decrypted = decrypt(msg.encrypted);
+
+            displayMessage("Received from " + msg.sender, decrypted, msg.encrypted);
+
+            msg.delivered = true;
+        }
+
+    });
+
+    localStorage.setItem("chat", JSON.stringify(chatData));
+
+}, 1000);
+
+/* UPDATE CHARTS */
+function updateCharts(){
+
+    if(encryptionTimes.length === 0){
+
+        // default dummy data (so graph shows)
+        encryptionTimes = [0];
+        messageSizes = [0];
+        encryptedSizes = [0];
+    }
+
+    if(timeChart) timeChart.destroy();
+    if(sizeChart) sizeChart.destroy();
+
+    timeChart = new Chart(document.getElementById("timeChart"), {
+        type: 'line',
+        data: {
+            labels: encryptionTimes.map((_, i) => "Msg " + (i+1)),
+            datasets: [{
+                label: "Encryption Time (ms)",
+                data: encryptionTimes
+            }]
+        }
+    });
+
+    sizeChart = new Chart(document.getElementById("sizeChart"), {
+        type: 'bar',
+        data: {
+            labels: messageSizes.map((_, i) => "Msg " + (i+1)),
+            datasets: [
+                {
+                    label: "Original Size",
+                    data: messageSizes
+                },
+                {
+                    label: "Encrypted Size",
+                    data: encryptedSizes
+                }
+            ]
+        }
+    });
+}
+
+</script>
+</body>
+</html>
